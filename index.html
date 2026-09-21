@@ -1,0 +1,770 @@
+<title>Квест 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#241a33;
+    --bg-2:#2c2140;
+    --bg-3:#352748;
+    --paper:#f8efe0;
+    --paper-2:#efe1c8;
+    --ink:#2c2013;
+    --ink-soft:#6f5f45;
+    --cream:#f5ecdc;
+    --cream-soft:#cabbdb;
+    --gold:#dcac54;
+    --gold-deep:#b9832e;
+    --rose:#e58a6d;
+    --line:rgba(220,172,84,.35);
+    --shadow: 0 18px 40px -18px rgba(10,6,20,.55);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--cream);
+    font-family:'Manrope',system-ui,sans-serif;
+    padding-left:20px;
+    padding-right:20px;
+  }
+  h1,h2,h3{
+    font-family:'Unbounded','Manrope',system-ui,sans-serif;
+    margin:0;
+    text-wrap:balance;
+    letter-spacing:-.01em;
+  }
+  p{margin:0;}
+  img{display:block;}
+  .hand{font-family:'Caveat',cursive;}
+
+  body{
+    background-image:
+      radial-gradient(600px 420px at 12% 0%, rgba(220,172,84,.16), transparent 60%),
+      radial-gradient(700px 500px at 92% 18%, rgba(229,138,109,.14), transparent 55%),
+      radial-gradient(900px 700px at 50% 100%, rgba(90,60,120,.35), transparent 60%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+
+  /* ---------- ambient decoration: balloons + confetti ---------- */
+  .decor{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:-1;
+  }
+  .decor .balloon{
+    position:absolute;
+    bottom:-18%;
+    font-size:34px;
+    opacity:.5;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
+    animation:balloonRise linear infinite;
+  }
+  .decor .confetti{
+    position:absolute;
+    top:-6%;
+    width:7px;
+    height:13px;
+    border-radius:2px;
+    opacity:0;
+    animation:confettiFall linear infinite;
+  }
+  @keyframes balloonRise{
+    0%{transform:translateY(0) translateX(0) rotate(-4deg);}
+    50%{transform:translateY(-55vh) translateX(16px) rotate(4deg);}
+    100%{transform:translateY(-120vh) translateX(-12px) rotate(-4deg);}
+  }
+  @keyframes confettiFall{
+    0%{transform:translateY(0) rotate(0deg); opacity:0;}
+    8%{opacity:.75;}
+    92%{opacity:.75;}
+    100%{transform:translateY(120vh) rotate(340deg); opacity:0;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .decor .balloon, .decor .confetti{animation:none; opacity:.35;}
+  }
+
+  .wrap{max-width:640px; margin:0 auto;}
+
+  /* ---------- progress header ---------- */
+  .progress{
+    position:sticky;
+    top:env(safe-area-inset-top,0px);
+    z-index:40;
+    padding:10px 16px 12px;
+    margin:14px auto 0;
+    max-width:640px;
+    background:rgba(36,26,51,.78);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1px solid var(--line);
+    border-radius:20px;
+    box-shadow:var(--shadow);
+  }
+  .progress__row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .progress__label{
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--cream-soft);
+    white-space:nowrap;
+  }
+  .stamps{display:flex; gap:6px;}
+  .stamp{
+    position:relative;
+    width:24px;height:24px;
+    border-radius:50%;
+    border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;
+    color:var(--cream-soft);
+    background:rgba(255,255,255,.03);
+    transition:transform .4s cubic-bezier(.34,1.56,.64,1), background .4s, border-color .4s, color .4s;
+  }
+  .stamp[data-done="1"]{
+    background:radial-gradient(circle at 35% 30%, #f0cd85, var(--gold) 60%, var(--gold-deep) 100%);
+    border-color:var(--gold);
+    color:#3a2708;
+    transform:scale(1.1) rotate(-6deg);
+    box-shadow:0 4px 14px -4px rgba(220,172,84,.7);
+  }
+  .progress__bar{
+    margin-top:9px;
+    height:4px;
+    border-radius:99px;
+    background:rgba(255,255,255,.08);
+    overflow:hidden;
+  }
+  .progress__bar-fill{
+    height:100%;
+    border-radius:99px;
+    background:linear-gradient(90deg, var(--rose), var(--gold));
+    transition:width .5s ease;
+    width:0%;
+  }
+
+  /* ---------- hero ---------- */
+  .hero{padding:64px 0 40px; text-align:center;}
+  .eyebrow{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--rose);
+    font-weight:700;
+    margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:clamp(30px,7vw,44px);
+    line-height:1.08;
+    color:var(--cream);
+    font-weight:700;
+  }
+  .hero h1 em{font-style:normal; color:var(--gold);}
+  .age-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top:14px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--gold);
+    border:1.5px solid var(--line);
+    background:rgba(220,172,84,.1);
+    padding:6px 14px;
+    border-radius:999px;
+  }
+  .hero p.lede{
+    margin:18px auto 0;
+    max-width:46ch;
+    color:var(--cream-soft);
+    font-size:16px;
+    line-height:1.6;
+  }
+  .hero-photo{position:relative; margin:34px auto 0; max-width:280px; transform:rotate(-3deg);}
+  .polaroid{background:var(--paper); padding:10px 10px 38px; border-radius:3px; box-shadow:var(--shadow);}
+  .polaroid img{width:100%; border-radius:1px; aspect-ratio:4/5; object-fit:cover;}
+  .polaroid figcaption{font-family:'Caveat',cursive; font-size:19px; color:var(--ink); text-align:center; margin-top:8px;}
+
+  .btn{
+    appearance:none; border:none; cursor:pointer;
+    font-family:'Manrope',system-ui,sans-serif; font-weight:700; font-size:15px;
+    border-radius:999px; padding:14px 26px;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:transform .25s, box-shadow .25s, opacity .25s;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-gold{
+    background:linear-gradient(135deg,#f0cd85,var(--gold) 55%,var(--gold-deep));
+    color:#3a2708;
+    box-shadow:0 12px 26px -10px rgba(220,172,84,.6);
+  }
+  .btn-gold:hover{box-shadow:0 16px 30px -8px rgba(220,172,84,.75);}
+  .btn-ghost{background:transparent; border:1.5px solid var(--line); color:var(--cream);}
+
+  .hero-cta{margin-top:34px;}
+
+  /* ---------- stream ---------- */
+  #stream{padding-top:6px;}
+
+  .block{
+    margin:20px 0;
+    opacity:0; transform:translateY(14px);
+    animation:rise .6s ease forwards;
+    scroll-margin-top:calc(env(safe-area-inset-top,0px) + 100px);
+  }
+  @keyframes rise{ to{opacity:1; transform:translateY(0);} }
+
+  /* answered entry (compact, read-only, stays visible = the readable log) */
+  .entry{
+    display:flex; gap:12px; align-items:flex-start;
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px 16px;
+  }
+  .entry__thumb{width:52px; height:52px; border-radius:10px; object-fit:cover; flex:none; box-shadow:0 6px 14px -6px rgba(0,0,0,.5);}
+  .entry__check{
+    flex:none; width:20px;height:20px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#f0cd85,var(--gold) 60%,var(--gold-deep) 100%);
+    color:#3a2708; font-size:11px; font-weight:800;
+    display:flex;align-items:center;justify-content:center; margin-top:2px;
+  }
+  .entry__body{min-width:0; flex:1;}
+  .entry__q{font-size:12.5px; color:var(--cream-soft); line-height:1.4;}
+  .entry__a{margin-top:4px; font-size:14.5px; color:var(--cream); line-height:1.5; white-space:pre-wrap; overflow-wrap:break-word;}
+
+  /* active question card */
+  .qcard{
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:26px 20px 24px;
+    box-shadow:var(--shadow);
+  }
+  .qcard__top{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .qcard__num{
+    font-family:'Unbounded',sans-serif; font-size:11.5px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--rose); font-weight:600;
+  }
+  .qcard__gift-tag{
+    font-size:11px; color:var(--gold); border:1px solid var(--line);
+    padding:3px 9px; border-radius:999px; white-space:nowrap;
+  }
+  .qcard-photo{margin:16px auto 0; max-width:220px; transform:rotate(-2deg);}
+  .qcard-photo .polaroid{padding:8px 8px 30px;}
+  .qcard-photo figcaption{font-size:16px;}
+  .qcard h2{font-size:clamp(19px,5vw,23px); color:var(--cream); margin-top:18px; line-height:1.32;}
+
+  .qcard textarea{
+    margin-top:16px;
+    width:100%;
+    min-height:78px;
+    field-sizing:content;
+    border:none;
+    border-radius:14px;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Manrope',system-ui,sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    padding:14px 16px;
+    resize:none;
+    box-shadow:0 8px 18px -12px rgba(0,0,0,.5);
+  }
+  .qcard textarea::placeholder{color:var(--ink-soft); opacity:.75;}
+  .qcard textarea:focus{outline:2px solid var(--gold); outline-offset:2px;}
+
+  .qcard__action{margin-top:16px; display:flex; flex-direction:column; align-items:flex-start; gap:9px;}
+  .hint{
+    font-size:13px; color:var(--rose);
+    opacity:0; transform:translateY(-4px);
+    transition:opacity .3s, transform .3s;
+  }
+  .hint.show{opacity:1; transform:translateY(0);}
+
+  /* gift interstitial */
+  .gift{
+    padding:24px 22px;
+    border-radius:18px;
+    background:linear-gradient(160deg, rgba(220,172,84,.18), rgba(229,138,109,.11));
+    border:1px solid var(--line);
+    text-align:center;
+  }
+  .gift .seal{
+    width:52px;height:52px; margin:0 auto 12px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #f0cd85, var(--gold) 60%, var(--gold-deep) 100%);
+    display:flex;align-items:center;justify-content:center; font-size:22px;
+    box-shadow:0 10px 24px -8px rgba(220,172,84,.7);
+  }
+  .gift h3{font-size:19px; color:var(--cream);}
+  .gift p{margin-top:8px; color:var(--cream-soft); font-size:14.5px; line-height:1.55;}
+  .gift .btn{margin-top:16px;}
+
+  /* finale */
+  .finale{
+    padding:38px 22px 40px;
+    border-radius:26px;
+    background:linear-gradient(165deg, var(--bg-3), var(--bg-2));
+    border:1px solid var(--line);
+    text-align:center;
+    box-shadow:var(--shadow);
+  }
+  .finale h2{font-size:clamp(24px,6vw,30px); color:var(--cream);}
+  .finale p.msg{margin:14px auto 0; max-width:44ch; color:var(--cream-soft); line-height:1.6; font-size:15px;}
+  .finale .btnrow{margin-top:22px; display:flex; justify-content:center; flex-wrap:wrap; gap:10px;}
+  .copyfeedback{margin-top:10px; font-size:12.5px; color:var(--gold); opacity:0; transition:opacity .3s;}
+  .backup-box{
+    margin:22px auto 0;
+    max-width:44ch;
+    padding:14px 16px;
+    border-radius:14px;
+    background:rgba(0,0,0,.16);
+    border:1px dashed var(--line);
+  }
+  .backup-status{font-size:12.5px; color:var(--cream-soft); line-height:1.5;}
+  .backup-link{
+    display:inline-block;
+    margin-top:6px;
+    font-size:12.5px;
+    color:var(--gold);
+    word-break:break-all;
+  }
+  .copyfeedback.show{opacity:1;}
+  .sign{margin-top:30px; font-family:'Caveat',cursive; font-size:25px; color:var(--gold);}
+  .sign small{display:block; font-family:'Manrope',sans-serif; font-size:11.5px; color:var(--cream-soft); letter-spacing:.06em; margin-top:4px;}
+
+  .spark{position:absolute; pointer-events:none; font-size:16px; animation:sparkle 900ms ease-out forwards;}
+  @keyframes sparkle{
+    from{opacity:1; transform:translate(0,0) scale(.6) rotate(0deg);}
+    to{opacity:0; transform:var(--dest) scale(1.1) rotate(var(--rot));}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .block{animation:none; opacity:1; transform:none;}
+    .spark{display:none;}
+  }
+
+  footer.credit{text-align:center; padding:10px 0 40px; font-size:11px; color:var(--cream-soft); opacity:.6;}
+</style>
+
+<div class="decor" aria-hidden="true">
+  <span class="balloon" style="left:4%; font-size:30px; animation-duration:26s; animation-delay:-3s;">🎈</span>
+  <span class="balloon" style="left:19%; font-size:38px; animation-duration:32s; animation-delay:-14s;">🎈</span>
+  <span class="balloon" style="left:37%; font-size:26px; animation-duration:22s; animation-delay:-9s;">🎈</span>
+  <span class="balloon" style="left:56%; font-size:36px; animation-duration:29s; animation-delay:-19s;">🎈</span>
+  <span class="balloon" style="left:74%; font-size:28px; animation-duration:24s; animation-delay:-6s;">🎈</span>
+  <span class="balloon" style="left:90%; font-size:33px; animation-duration:30s; animation-delay:-22s;">🎈</span>
+  <i class="confetti" style="left:6%; background:var(--gold); animation-duration:8s; animation-delay:-1s;"></i>
+  <i class="confetti" style="left:14%; background:var(--rose); animation-duration:9.5s; animation-delay:-5s;"></i>
+  <i class="confetti" style="left:23%; background:var(--cream); animation-duration:7s; animation-delay:-3s;"></i>
+  <i class="confetti" style="left:31%; background:var(--gold-deep); animation-duration:10s; animation-delay:-7s;"></i>
+  <i class="confetti" style="left:40%; background:var(--rose); animation-duration:8.5s; animation-delay:-2s;"></i>
+  <i class="confetti" style="left:48%; background:var(--gold); animation-duration:9s; animation-delay:-6s;"></i>
+  <i class="confetti" style="left:57%; background:var(--cream); animation-duration:7.5s; animation-delay:-4s;"></i>
+  <i class="confetti" style="left:65%; background:var(--gold-deep); animation-duration:9.5s; animation-delay:-8s;"></i>
+  <i class="confetti" style="left:73%; background:var(--rose); animation-duration:8s; animation-delay:-2.5s;"></i>
+  <i class="confetti" style="left:81%; background:var(--gold); animation-duration:10.5s; animation-delay:-6.5s;"></i>
+  <i class="confetti" style="left:88%; background:var(--cream); animation-duration:7.8s; animation-delay:-4.5s;"></i>
+  <i class="confetti" style="left:95%; background:var(--gold-deep); animation-duration:9.2s; animation-delay:-1.5s;"></i>
+</div>
+
+<div class="progress">
+  <div class="progress__row">
+    <span class="progress__label" id="progress-label">Вопрос 1 из 10</span>
+    <div class="stamps" id="stamps">
+      <div class="stamp" data-stamp="1">1</div>
+      <div class="stamp" data-stamp="2">2</div>
+      <div class="stamp" data-stamp="3">3</div>
+      <div class="stamp" data-stamp="4">4</div>
+    </div>
+  </div>
+  <div class="progress__bar"><div class="progress__bar-fill" id="progress-fill"></div></div>
+</div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <span class="eyebrow">Маленький квест от Лизы</span>
+    <h1>С днём рождения,<br><em>Глен</em>!</h1>
+    <span class="age-pill">🎈 29 лет</span>
+    <p class="lede">Это подарок. Точнее — четыре. Здесь нет правильных ответов — только ты и немного этого года.</p>
+
+    <figure class="hero-photo">
+      <div class="polaroid">
+        <img src="photos/sunset-hill.jpg" alt="Мы вдвоём на закате" loading="lazy">
+        <figcaption class="hand">начнём?</figcaption>
+      </div>
+    </figure>
+
+    <div class="hero-cta">
+      <button class="btn btn-gold" id="start-btn">Начать квест →</button>
+    </div>
+  </section>
+
+  <div id="stream"></div>
+
+</div>
+
+<footer class="credit">сделано с любовью · для тебя, и только для тебя</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STORAGE_KEY = 'quest2026-progress-v2';
+
+  var QUESTIONS = [
+    { photo:'park-lights',   caption:'тот вечер, помнишь?',      text:'Вспомни 3 самых приятных дня, которые ты провёл в этом году' },
+    { photo:'mini-golf',     caption:'разминка перед вопросом',  text:'Назови 5 видов спорта, которыми ты успел заняться до 29 лет' },
+    { photo:'desert-atv',    caption:'адреналин уже был',        text:'Назови 3 своих самых адреналиновых или рисковых поступка в жизни' },
+    { photo:'proud-russia',  caption:'буквально «горжусь»',      text:'Назови 5 вещей, которыми ты гордишься по жизни' },
+    { photo:'tula-wings',    caption:'крылья в Туле',            text:'Назови 3 места, которые тебе очень запомнились в этом году' },
+    { photo:'paddleboard',   caption:'тишина на воде',           text:'Назови 3 своих любимых спокойных занятия, которые наполняют тебя' },
+    { photo:'boat-hat',      caption:'хочется повторить',        text:'Назови 3 места, которых ты ещё хочешь побывать вместе' },
+    { photo:'boat-together', caption:'мы вдвоём',                text:'Назови, на каком концерте ты бы хотел побывать' },
+    { photo:'cinema',        caption:'а если про кино...',       text:'Назови 3 фильма или сериала, которые тебе очень понравились в этом году' },
+    { photo:'sunset-hill',   caption:'закат где-то в России',    text:'Назови, сколько регионов России тебе удалось посетить до 29 лет' }
+  ];
+  var TOTAL = QUESTIONS.length;
+  var TOTAL_GIFTS = 4;
+  // spread the 4 gifts evenly across the 10 questions: [3, 5, 8, 10]
+  var MILESTONES = [];
+  for(var g=1; g<=TOTAL_GIFTS; g++){ MILESTONES.push(Math.ceil(TOTAL*g/TOTAL_GIFTS)); }
+  function giftNumberAt(idx){
+    var k = MILESTONES.indexOf(idx);
+    return k === -1 ? 0 : (k+1);
+  }
+
+  function safeGet(){
+    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }catch(e){ return {}; }
+  }
+  function safeSet(data){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+  }
+
+  var state = safeGet();
+  state.answers = state.answers || {};
+  state.claimedGifts = state.claimedGifts || 0;
+
+  var streamEl = document.getElementById('stream');
+  var labelEl = document.getElementById('progress-label');
+  var fillEl = document.getElementById('progress-fill');
+
+  function answeredCount(){
+    var n = 0;
+    for(var i=1;i<=TOTAL;i++){ if(state.answers['q'+i]) n++; }
+    return n;
+  }
+
+  function setStamps(){
+    document.querySelectorAll('.stamp').forEach(function(s){
+      var n = Number(s.getAttribute('data-stamp'));
+      if(n <= state.claimedGifts){ s.setAttribute('data-done','1'); s.textContent = '✓'; }
+      else { s.removeAttribute('data-done'); s.textContent = n; }
+    });
+  }
+
+  function updateHeader(){
+    var ac = answeredCount();
+    if(ac >= TOTAL){
+      labelEl.textContent = 'Все 10 вопросов пройдены';
+    } else {
+      labelEl.textContent = 'Вопрос ' + (ac+1) + ' из ' + TOTAL;
+    }
+    fillEl.style.width = Math.round((ac/TOTAL)*100) + '%';
+    setStamps();
+  }
+
+  function burst(fromEl){
+    if(reduceMotion || !fromEl) return;
+    var chars = ['✨','💛','🎉','✦'];
+    var rect = fromEl.getBoundingClientRect();
+    for(var i=0;i<10;i++){
+      var s = document.createElement('span');
+      s.className = 'spark';
+      s.textContent = chars[i % chars.length];
+      var angle = Math.random()*Math.PI*2;
+      var dist = 40 + Math.random()*50;
+      s.style.setProperty('--dest', 'translate(' + (Math.cos(angle)*dist) + 'px,' + (Math.sin(angle)*dist - 20) + 'px)');
+      s.style.setProperty('--rot', (Math.random()*160-80) + 'deg');
+      s.style.left = (rect.left + rect.width/2 + window.scrollX) + 'px';
+      s.style.top = (rect.top + window.scrollY) + 'px';
+      s.style.position = 'absolute';
+      document.body.appendChild(s);
+      (function(node){ setTimeout(function(){ node.remove(); }, 950); })(s);
+    }
+  }
+
+  function scrollToEnd(){
+    setTimeout(function(){
+      var last = streamEl.lastElementChild;
+      if(last) last.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'});
+    }, 80);
+  }
+
+  function makeEntry(idx){
+    var q = QUESTIONS[idx-1];
+    var wrap = document.createElement('div');
+    wrap.className = 'block entry';
+    wrap.innerHTML =
+      '<img class="entry__thumb" src="photos/'+q.photo+'.jpg" alt="" loading="lazy">' +
+      '<div class="entry__body">' +
+        '<div class="entry__q">Вопрос '+idx+' · '+escapeHtml(q.text)+'</div>' +
+        '<div class="entry__a"></div>' +
+      '</div>' +
+      '<span class="entry__check">✓</span>';
+    wrap.querySelector('.entry__a').textContent = state.answers['q'+idx] || '';
+    return wrap;
+  }
+
+  function escapeHtml(str){
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function makeGift(giftNum, isLast){
+    var wrap = document.createElement('div');
+    wrap.className = 'block gift';
+    wrap.innerHTML =
+      '<div class="seal">🎈</div>' +
+      '<h3>Ура, подарок №'+giftNum+'! 🎉</h3>' +
+      '<p>Лопни шарик с цифрой '+giftNum+' — внутри подсказка, где искать подарок.'+(isLast ? ' После — жми «К финалу».' : ' Затем возвращайся, квест продолжится сам.')+'</p>' +
+      '<button class="btn btn-ghost" data-claim-gift="'+giftNum+'">'+(isLast ? 'К финалу →' : 'Дальше →')+'</button>';
+    return wrap;
+  }
+
+  function makeQuestionCard(idx){
+    var q = QUESTIONS[idx-1];
+    var wrap = document.createElement('div');
+    wrap.className = 'block qcard';
+    wrap.innerHTML =
+      '<div class="qcard__top">' +
+        '<span class="qcard__num">Вопрос '+idx+' из '+TOTAL+'</span>' +
+        (giftNumberAt(idx) ? '<span class="qcard__gift-tag">🎈 приз №'+giftNumberAt(idx)+'</span>' : '') +
+      '</div>' +
+      '<figure class="qcard-photo"><div class="polaroid">' +
+        '<img src="photos/'+q.photo+'.jpg" alt="" loading="lazy">' +
+        '<figcaption class="hand">'+escapeHtml(q.caption)+'</figcaption>' +
+      '</div></figure>' +
+      '<h2>'+escapeHtml(q.text)+'</h2>' +
+      '<textarea id="ans-'+idx+'" placeholder="Пиши как есть, черновиков не будет..."></textarea>' +
+      '<div class="qcard__action">' +
+        '<button class="btn btn-gold" data-submit="'+idx+'">Ответить →</button>' +
+        '<span class="hint" data-hint="'+idx+'">Напиши хотя бы пару слов — и можно дальше 🙂</span>' +
+      '</div>';
+    return wrap;
+  }
+
+  function makeFinale(){
+    var wrap = document.createElement('div');
+    wrap.className = 'block finale';
+    wrap.innerHTML =
+      '<h2>Квест пройден 🎉</h2>' +
+      '<p class="msg">Все 4 приза — твои, а все твои ответы сохранены выше: можно пролистать назад и перечитать в любой момент. Спасибо, что прошёл это со мной.</p>' +
+      '<div class="btnrow"><button class="btn btn-ghost" id="copy-btn">Скопировать все ответы</button></div>' +
+      '<p class="copyfeedback" id="copy-feedback">Скопировано ✓</p>' +
+      '<div class="backup-box" id="backup-box"><p class="backup-status" id="backup-status">Сохраняю резервную копию ответов…</p></div>' +
+      '<p class="sign">с любовью, твоя Лиза 💛<small>2026 — и это только начало</small></p>';
+    return wrap;
+  }
+
+  function buildMarkdown(){
+    var lines = ['# Квест 2026 — ответы Глена', '', '_Записано ' + new Date().toLocaleString('ru-RU') + '_', ''];
+    for(var i=1;i<=TOTAL;i++){
+      lines.push('### '+i+'. '+QUESTIONS[i-1].text);
+      lines.push('');
+      lines.push(state.answers['q'+i] || '_(без ответа)_');
+      lines.push('');
+    }
+    return lines.join('\n');
+  }
+
+  function renderBackupBox(){
+    var box = document.getElementById('backup-box');
+    if(!box) return;
+    if(state.gistUrl){
+      box.innerHTML =
+        '<p class="backup-status">Резервная копия ответов сохранена отдельно — сохрани эту ссылку:</p>' +
+        '<a class="backup-link" href="'+state.gistUrl+'" target="_blank" rel="noopener">'+state.gistUrl+'</a>' +
+        '<button class="btn btn-ghost" id="copy-link-btn" style="margin-top:10px;">Скопировать ссылку</button>';
+      var copyLinkBtn = document.getElementById('copy-link-btn');
+      if(copyLinkBtn){
+        copyLinkBtn.addEventListener('click', function(){
+          copyText(state.gistUrl, copyLinkBtn, 'Скопировано ✓', 'Скопировать ссылку');
+        });
+      }
+    } else if(state.gistFailed){
+      box.innerHTML = '<p class="backup-status">Не удалось сохранить резервную копию автоматически — но все ответы уже видны выше на странице, их можно скопировать кнопкой ниже.</p>';
+    } else {
+      box.innerHTML = '<p class="backup-status">Сохраняю резервную копию ответов…</p>';
+    }
+  }
+
+  function ensureGistBackup(){
+    if(state.gistUrl || state.gistFailed) { renderBackupBox(); return; }
+    fetch('https://api.github.com/gists', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        description: 'Квест 2026 — ответы Глена',
+        public: false,
+        files: { 'kvest-2026-otvety.md': { content: buildMarkdown() } }
+      })
+    }).then(function(res){
+      if(!res.ok) throw new Error('gist request failed');
+      return res.json();
+    }).then(function(data){
+      state.gistUrl = data.html_url;
+      safeSet(state);
+      renderBackupBox();
+    }).catch(function(){
+      state.gistFailed = true;
+      safeSet(state);
+      renderBackupBox();
+    });
+  }
+
+  function bindEntryEvents(root){
+    root.querySelectorAll('[data-submit]').forEach(function(btn){
+      btn.addEventListener('click', function(){ onSubmit(Number(btn.getAttribute('data-submit'))); });
+    });
+    root.querySelectorAll('[data-claim-gift]').forEach(function(btn){
+      btn.addEventListener('click', function(){ onClaimGift(Number(btn.getAttribute('data-claim-gift'))); });
+    });
+  }
+
+  function onSubmit(idx){
+    var ta = document.getElementById('ans-'+idx);
+    var val = (ta.value || '').trim();
+    var hint = document.querySelector('[data-hint="'+idx+'"]');
+    if(!val){
+      if(hint){ hint.classList.add('show'); setTimeout(function(){ hint.classList.remove('show'); }, 2600); }
+      return;
+    }
+    var btn = document.querySelector('[data-submit="'+idx+'"]');
+    state.answers['q'+idx] = val;
+    safeSet(state);
+    burst(btn);
+    render();
+  }
+
+  function onClaimGift(n){
+    if(n > state.claimedGifts){
+      state.claimedGifts = n;
+      safeSet(state);
+    }
+    render();
+  }
+
+  function copyAnswers(){
+    var lines = [];
+    for(var i=1;i<=TOTAL;i++){
+      lines.push((i)+'. '+QUESTIONS[i-1].text);
+      lines.push('   → ' + (state.answers['q'+i] || ''));
+      lines.push('');
+    }
+    var text = lines.join('\n');
+    var fb = document.getElementById('copy-feedback');
+    function showFb(){ if(fb){ fb.classList.add('show'); setTimeout(function(){ fb.classList.remove('show'); }, 2200); } }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(showFb).catch(function(){ fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+  function fallbackCopy(text){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      var fb = document.getElementById('copy-feedback');
+      if(fb){ fb.classList.add('show'); setTimeout(function(){ fb.classList.remove('show'); }, 2200); }
+    }catch(e){}
+  }
+
+  function copyText(text, btnEl, doneLabel, resetLabel){
+    function done(){
+      if(btnEl){
+        btnEl.textContent = doneLabel;
+        setTimeout(function(){ btnEl.textContent = resetLabel; }, 2000);
+      }
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopyGeneric(text, done); });
+    } else {
+      fallbackCopyGeneric(text, done);
+    }
+  }
+  function fallbackCopyGeneric(text, cb){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      if(cb) cb();
+    }catch(e){}
+  }
+
+  var hasRenderedOnce = false;
+
+  function render(){
+    var isFirstRender = !hasRenderedOnce;
+    hasRenderedOnce = true;
+    var scrollBefore = streamEl.childElementCount;
+    streamEl.innerHTML = '';
+    var ac = answeredCount();
+
+    // answered entries
+    for(var i=1;i<=ac;i++){
+      streamEl.appendChild(makeEntry(i));
+      // gift interstitial right after a milestone question, if not yet claimed
+      var giftNum = giftNumberAt(i);
+      if(giftNum && state.claimedGifts < giftNum){
+        streamEl.appendChild(makeGift(giftNum, giftNum === TOTAL_GIFTS));
+        bindEntryEvents(streamEl);
+        updateHeader();
+        if(!isFirstRender && scrollBefore !== streamEl.childElementCount) scrollToEnd();
+        return;
+      }
+    }
+
+    if(ac < TOTAL){
+      streamEl.appendChild(makeQuestionCard(ac+1));
+    } else if(state.claimedGifts >= TOTAL_GIFTS){
+      streamEl.appendChild(makeFinale());
+      var copyBtn = document.getElementById('copy-btn');
+      if(copyBtn) copyBtn.addEventListener('click', copyAnswers);
+      ensureGistBackup();
+    }
+
+    bindEntryEvents(streamEl);
+    updateHeader();
+    if(!isFirstRender && scrollBefore !== streamEl.childElementCount) scrollToEnd();
+  }
+
+  document.getElementById('start-btn').addEventListener('click', function(){
+    streamEl.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'});
+  });
+
+  render();
+})();
+</script>
