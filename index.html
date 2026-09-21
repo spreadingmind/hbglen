@@ -213,7 +213,7 @@
   .hero-cta{margin-top:34px;}
 
   /* ---------- stream ---------- */
-  #stream{padding-top:6px;}
+  #stream{padding-top:6px; scroll-margin-top:calc(env(safe-area-inset-top,0px) + 92px);}
 
   .block{
     margin:20px 0;
@@ -259,9 +259,9 @@
     font-size:11px; color:var(--gold); border:1px solid var(--line);
     padding:3px 9px; border-radius:999px; white-space:nowrap;
   }
-  .qcard-photo{margin:16px auto 0; max-width:220px; transform:rotate(-2deg);}
-  .qcard-photo .polaroid{padding:8px 8px 30px;}
-  .qcard-photo figcaption{font-size:16px;}
+  .qcard-photo{margin:16px auto 0; max-width:360px; transform:rotate(-2deg);}
+  .qcard-photo .polaroid{padding:10px 10px 34px;}
+  .qcard-photo figcaption{font-size:17px;}
   .qcard h2{font-size:clamp(19px,5vw,23px); color:var(--cream); margin-top:18px; line-height:1.32;}
 
   .qcard textarea{
@@ -400,8 +400,8 @@
 
     <figure class="hero-photo">
       <div class="polaroid">
-        <img src="photos/sunset-hill.jpg" alt="Мы вдвоём на закате" loading="lazy">
-        <figcaption class="hand">начнём?</figcaption>
+        <img src="photos/portrait.jpg" alt="Глен" loading="lazy">
+        <figcaption class="hand">Мой Красавчик Светловолосый</figcaption>
       </div>
     </figure>
 
@@ -450,6 +450,23 @@
   function safeSet(data){
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
   }
+  function safeClear(){
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  }
+
+  // visiting the page with ?reset=1 wipes any saved progress in THIS browser
+  // and cleans the URL back to plain, so the link stays shareable as-is.
+  (function handleResetParam(){
+    try{
+      var params = new URLSearchParams(location.search);
+      if(params.get('reset') === '1'){
+        safeClear();
+        var url = new URL(location.href);
+        url.searchParams.delete('reset');
+        history.replaceState(null, '', url.pathname + (url.search || '') + url.hash);
+      }
+    }catch(e){}
+  })();
 
   var state = safeGet();
   state.answers = state.answers || {};
@@ -604,7 +621,7 @@
         });
       }
     } else if(state.gistFailed){
-      box.innerHTML = '<p class="backup-status">Не удалось сохранить резервную копию автоматически — но все ответы уже видны выше на странице, их можно скопировать кнопкой ниже.</p>';
+      box.remove();
     } else {
       box.innerHTML = '<p class="backup-status">Сохраняю резервную копию ответов…</p>';
     }
